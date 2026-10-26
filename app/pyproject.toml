@@ -23,6 +23,11 @@ dependencies = []
 [project.gui-scripts]
 mergerfs-panel = "mergerfs_panel.__main__:main"
 
+[project.urls]
+Homepage = "https://github.com/ztomasic/mergerfs-panel"
+Repository = "https://github.com/ztomasic/mergerfs-panel"
+Issues = "https://github.com/ztomasic/mergerfs-panel/issues"
+
 [tool.setuptools]
 package-dir = { "" = "src" }
 packages = ["mergerfs_panel"]

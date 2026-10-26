@@ -12,7 +12,7 @@ Release:        1%{?dist}
 Summary:        Two-panel GTK4 manager for mergerfs pools
 
 License:        MIT
-URL:            https://trapexit.github.io/mergerfs/
+URL:            https://github.com/ztomasic/mergerfs-panel
 Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
 
