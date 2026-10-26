@@ -7,7 +7,7 @@ Disks can be added as live branches by dragging them onto a pool; pools \
 and branches can be dragged back to unmount or remove them.
 
 Name:           mergerfs-panel
-Version:        0.1.0
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        Two-panel GTK4 manager for mergerfs pools
 
@@ -59,5 +59,9 @@ appstreamcli validate --no-net data/mergerfs-panel.metainfo.xml || true
 %{_metainfodir}/mergerfs-panel.metainfo.xml
 
 %changelog
+* Mon Oct 26 2026 MergerFS Panel contributors <maintainers@example.com> - 0.2.0-1
+- Add opt-in boot restore through a systemd user service and lingering.
+- Add the headless --restore-pools command.
+
 * Mon Oct 26 2026 MergerFS Panel contributors <maintainers@example.com> - 0.1.0-1
 - Initial package.

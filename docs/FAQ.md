@@ -61,10 +61,16 @@ but it works for plain files.
 
 ## Can the pool be mounted at boot?
 
-Yes, through `/etc/fstab` or a systemd mount unit, both of which run as root. Example:
+Yes. The simplest option is the **Mount pools at boot** checkbox in the app: it
+installs a systemd user service, enables lingering, and restores managed pools at
+boot without the app running. It waits up to ten minutes for branch disks to be
+mounted. See [USAGE.md](USAGE.md#restore-pools-at-boot).
+
+For a root-owned pool at a fixed path, use `/etc/fstab` or a systemd mount unit
+instead:
 
 ```fstab
-/run/media/you/disk1:/run/media/you/disk2  /srv/media  mergerfs  defaults,nofail,allow_other,category.create=mfs,minfreespace=4G  0 0
+/run/media/you/disk1:/run/media/you/disk2  /srv/media  mergerfs  defaults,nofail,allow_other,category.create=mfs,minfreespace=4G  0  0
 ```
 
 `nofail` lets the system boot when a branch is missing. Make sure the branch

@@ -90,6 +90,55 @@ Unmounting tries `fusermount3 -u`, then `mergerfs-fusermount -u`, then `umount`.
 A busy pool returns the helper's error. Close open files, stop services using the
 pool, then retry. The app never performs a lazy unmount automatically.
 
+## Restore pools at boot
+
+The **Mount pools at boot** checkbox in the header installs a systemd user service
+at `~/.config/systemd/user/mergerfs-panel-restore.service` and enables it. So that
+the service can start before you log in, the app also enables lingering for your
+user (`loginctl enable-linger`), which asks for authorization once.
+
+The unit runs:
+
+```
+<python> -m mergerfs_panel --restore-pools --wait 600
+```
+
+At boot it mounts every managed pool whose `autostart` is true and exits. Pools that
+are already mounted are skipped. The application does not need to run and no window
+is created; output goes to the systemd journal.
+
+### Branch availability
+
+mergerfs can only pool mounted filesystems. At boot, removable disks may not be
+mounted yet, so the restore command polls for the configured branch directories:
+
+- a pool is mounted as soon as all of its branches exist;
+- when the deadline passes (10 minutes in the generated unit), remaining pools are
+  mounted with the branches that exist, and the missing ones are logged;
+- pools with no branch directory at all are skipped.
+
+If your disks are mounted by the desktop at login, log in within the wait window for
+boot restore to succeed. Disks that must always be available at boot belong in
+fstab or a systemd mount unit, not in desktop removable-media handling.
+
+### Running it manually
+
+```bash
+mergerfs-panel --restore-pools --wait 0     # try now, do not wait
+mergerfs-panel --restore-pools --wait 120   # wait up to two minutes
+```
+
+### Status and turning it off
+
+```bash
+systemctl --user status mergerfs-panel-restore.service
+journalctl --user -u mergerfs-panel-restore.service -b
+```
+
+Unchecking the box disables and removes the unit. Lingering is left enabled: it is a
+per-user setting that other user services may rely on, and on its own it starts
+nothing.
+
 ## File managers
 
 A mergerfs pool is a FUSE mount with no block device, so it does not appear in a

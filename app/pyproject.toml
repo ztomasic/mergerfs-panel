@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mergerfs-panel"
-version = "0.1.0"
+version = "0.2.0"
 description = "Two-panel GTK4 manager for mergerfs pools with drag and drop"
 readme = { text = "Manage disks and mergerfs pools with drag and drop.", content-type = "text/plain" }
 requires-python = ">=3.9"

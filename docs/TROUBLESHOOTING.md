@@ -108,8 +108,43 @@ The status bar reports why. Common causes:
 - the mount point is busy;
 - the pool was mounted by another user.
 
-Autostart runs when the app starts, not at boot. Use fstab/systemd if the pool must
-exist before login.
+Autostart at app launch is separate from the **Mount pools at boot** checkbox; the
+next section covers the boot service.
+
+## Pools are not restored at boot
+
+1. Check the checkbox and the two systemd facts behind it:
+
+   ```bash
+   systemctl --user is-enabled mergerfs-panel-restore.service
+   loginctl show-user "$USER" -p Linger --value
+   ```
+
+   The box is checked only when the unit is enabled **and** lingering is on. If
+   lingering is off, toggle the box again and approve the authorization prompt.
+
+2. Inspect the service and its journal:
+
+   ```bash
+   systemctl --user status mergerfs-panel-restore.service
+   journalctl --user -u mergerfs-panel-restore.service -b
+   ```
+
+3. Run the restore command manually to see why a pool was skipped:
+
+   ```bash
+   mergerfs-panel --restore-pools --wait 0
+   ```
+
+4. Verify the pool is in the config with `autostart: true`, and that its branches
+   are directories at restore time. The service does not mount disks.
+
+5. If the branch filesystems are mounted by the desktop at login, they may appear
+   after the unit's ten-minute deadline. Move them to fstab/systemd or log in
+   within the window.
+
+Boot restore requires systemd. On other init systems, use fstab or the init system's
+own unit to mount the pool.
 
 ## A web server gets 403 or 404 from the pool
 

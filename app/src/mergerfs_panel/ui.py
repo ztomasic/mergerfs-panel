@@ -134,6 +134,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.disks: list[backend.Disk] = []
         self.pools: list[backend.Pool] = []
         self._refreshing = False
+        self._boot_updating = False
 
         self.set_default_size(1180, 720)
         self._apply_css()
@@ -146,6 +147,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.refresh()
         self._autostart_pools()
+        self._refresh_boot_state()
 
     # -- construction ------------------------------------------------------
 
@@ -166,6 +168,15 @@ class MainWindow(Gtk.ApplicationWindow):
         refresh_button.set_tooltip_text("Reload disks, pools and branches")
         refresh_button.connect("clicked", lambda *_: self.refresh())
         header.pack_start(refresh_button)
+
+        self.boot_check = Gtk.CheckButton(label="Mount pools at boot")
+        self.boot_check.set_tooltip_text(
+            "Install a systemd user service and enable lingering so managed pools "
+            "are mounted at boot without starting the app."
+        )
+        self.boot_check.set_sensitive(False)
+        self.boot_check.connect("toggled", self._on_boot_toggled)
+        header.pack_start(self.boot_check)
 
         new_pool_button = Gtk.Button(label="New pool")
         new_pool_button.add_css_class("suggested-action")
@@ -692,6 +703,75 @@ class MainWindow(Gtk.ApplicationWindow):
             "Unmount",
             accept,
         )
+
+    # -- boot restore ------------------------------------------------------
+
+    def _refresh_boot_state(self) -> None:
+        def work():
+            from . import boot
+
+            if not boot.supported():
+                return (False, False)
+            return (True, boot.enabled())
+
+        run_async(
+            work,
+            self._apply_boot_state,
+            lambda _exc: self._apply_boot_state((False, False)),
+        )
+
+    def _apply_boot_state(self, state) -> None:
+        supported, active = state
+        self._boot_updating = True
+        self.boot_check.set_active(bool(active))
+        self._boot_updating = False
+        self.boot_check.set_sensitive(bool(supported))
+        if supported:
+            self.boot_check.set_tooltip_text(
+                "Install a systemd user service and enable lingering so managed pools "
+                "are mounted at boot without starting the app."
+            )
+        else:
+            self.boot_check.set_tooltip_text(
+                "Boot restore requires a running systemd user session."
+            )
+
+    def _on_boot_toggled(self, checkbox) -> None:
+        if self._boot_updating:
+            return
+        desired = checkbox.get_active()
+        checkbox.set_sensitive(False)
+        self._set_status("Enabling boot restore…" if desired else "Disabling boot restore…")
+
+        def work():
+            from . import boot
+
+            return boot.enable() if desired else boot.disable()
+
+        def done(result):
+            ok, message = result
+            self._boot_updating = True
+            if not ok:
+                checkbox.set_active(not desired)
+            self._boot_updating = False
+            checkbox.set_sensitive(True)
+            if ok:
+                self._set_status(message)
+            else:
+                self._set_status("")
+                self._error("Boot restore", message)
+            self._refresh_boot_state()
+
+        def failed(exc):
+            self._boot_updating = True
+            checkbox.set_active(not desired)
+            self._boot_updating = False
+            checkbox.set_sensitive(True)
+            self._set_status("")
+            self._error("Boot restore", str(exc))
+            self._refresh_boot_state()
+
+        run_async(work, done, failed)
 
     def _mount_for_new_pool(self, payload: dict) -> None:
         disk = next((item for item in self.disks if item.device == payload.get("device")), None)

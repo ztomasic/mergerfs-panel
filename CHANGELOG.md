@@ -4,6 +4,36 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-10-26
+
+### Added
+
+- **Mount pools at boot.** A checkbox in the header bar installs and enables a
+  systemd user service and turns on lingering, so managed pools are restored at
+  boot without starting the application.
+- **`--restore-pools`** headless mode (with `--wait SECONDS`) that mounts the
+  configured pools, waits for branch directories to appear — for example disks
+  mounted at login — and logs the outcome. The boot service runs this command.
+- Boot restore honours each pool's `autostart` flag. Pools with no branch
+  directory are skipped with a log message; after the deadline, remaining pools
+  are mounted with the branches that exist.
+- 13 new tests: unit generation and systemd quoting, service install and rollback
+  with mocked systemd, and live restore tests (full branches, missing branch,
+  late branch, already mounted, autostart disabled, no pools).
+
+### Changed
+
+- The generated unit pins `PYTHONPATH` to the package that created it, so the
+  service never silently runs a different installed version.
+
+### Notes
+
+- Branch filesystems must be mounted before mergerfs can use them. The app does
+  not mount disks at boot; it waits for them for up to ten minutes.
+- Toggling the checkbox requires one authorization prompt to enable lingering.
+  Disabling it removes the unit but leaves lingering enabled, since other user
+  services may rely on it.
+
 ## [0.1.0] - 2026-10-26
 
 First public release.
@@ -39,4 +69,5 @@ First public release.
 - Branch changes on pools not managed by the app are live only.
 - A mergerfs pool is a FUSE mount and cannot appear in a file manager's device pane.
 
+[0.2.0]: https://github.com/ztomasic/mergerfs-panel/releases/tag/v0.2.0
 [0.1.0]: https://github.com/ztomasic/mergerfs-panel/releases/tag/v0.1.0

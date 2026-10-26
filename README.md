@@ -21,6 +21,8 @@ drag-and-drop branch management that takes effect on the live mount.
 - **Button equivalents.** Every gesture has a button, so nothing is drag-only.
 - **Persistence.** Pools created in the app are stored in a small JSON config and
   recreated when the app starts.
+- **Boot restore (optional).** A header checkbox installs a systemd user service and
+  enables lingering, so managed pools are mounted at boot without opening the app.
 - **No root helper.** Disks are mounted through UDisks2 (polkit); pools are mounted
   as your own user. The app never runs setuid or as root.
 
@@ -34,6 +36,9 @@ drag-and-drop branch management that takes effect on the live mount.
 `mergerfs` itself is only needed to create new pools; the app can still list disks
 and existing pools without it. It is not in Fedora's repositories — use the
 [upstream releases](https://github.com/trapexit/mergerfs/releases).
+
+Boot restore additionally needs systemd with a running user session (the checkbox
+enables lingering so the service starts at boot).
 
 ## Install
 
@@ -95,6 +100,9 @@ Devices list — bookmark its mount point instead. See the
   `path1:path2` list), which mergerfs applies to the running mount.
 - **Unmounting** falls back through `fusermount3 -u`, `mergerfs-fusermount -u`, and
   `umount`.
+- **Boot restore** uses a systemd user service that runs
+  `mergerfs-panel --restore-pools`, enabled together with lingering from the header
+  checkbox.
 
 Details and design trade-offs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
@@ -102,8 +110,8 @@ Details and design trade-offs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 - Pools mounted by root or another user are listed but their branches are read-only
   to this process; run the app as the user who owns the mount.
-- Pools are restored when the app starts, not at boot. Use fstab or a systemd unit
-  for a boot-time mount.
+- Boot restore is opt-in; without it, pools are restored when the app starts. The
+  service waits up to ten minutes for branch disks, but it does not mount them.
 - Branch changes on pools the app did not create are live only and are not persisted.
 - There is no file browser; open the pool in your file manager.
 

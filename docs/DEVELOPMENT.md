@@ -37,6 +37,9 @@ The suite covers:
 - branch designation parsing and serialization;
 - path validation (self, ancestor, descendant, duplicate, `/`, missing);
 - config persistence and autostart filtering;
+- boot restore: unit text and systemd quoting, service install and rollback with
+  mocked systemd, and live restore (all branches, missing branch, late branch,
+  already mounted, autostart disabled, no pools);
 - a **live mergerfs pool** in `/tmp`: mount, add a branch, write a file, remove the
   branch, unmount (skipped when mergerfs or FUSE is unavailable);
 - UDisks2 enumeration (skipped when the system bus or udisks2 is unavailable).
@@ -63,6 +66,39 @@ MFP_DEBUG=1 PYTHONPATH=app/src python3 -m mergerfs_panel
 
 Logs refresh start/end, counts, and errors to stderr. The `_debug` helper is the only
 logging mechanism; keep it cheap and side-effect free.
+
+## Boot restore
+
+`boot.py` is GTK-free. Exercise the headless command against a throwaway config
+without touching your real pools:
+
+```bash
+D=$(mktemp -d)
+mkdir -p "$D/disk1" "$D/disk2" "$D/xdg"
+XDG_CONFIG_HOME="$D/xdg" PYTHONPATH=app/src python3 - <<PY
+from mergerfs_panel.config import Config
+Config().record_pool("$D/pool", "demo", ["$D/disk1", "$D/disk2"])
+PY
+XDG_CONFIG_HOME="$D/xdg" PYTHONPATH=app/src python3 -m mergerfs_panel --restore-pools --wait 0
+fusermount3 -u "$D/pool"
+```
+
+Generate a unit and validate it with systemd without enabling it:
+
+```bash
+PYTHONPATH=app/src python3 - <<'PY'
+from mergerfs_panel import boot
+command, environment = boot._restore_command()
+print(boot.unit_text(command, 30, environment))
+PY
+# write it to ~/.config/systemd/user/ and run:
+systemd-analyze verify --user ~/.config/systemd/user/mergerfs-panel-restore.service
+```
+
+Never enable lingering from automated tests; the service installation tests mock
+`systemctl`, `loginctl`, and `_enable_linger` instead. Inspect a real run with
+`systemctl --user status mergerfs-panel-restore.service` and
+`journalctl --user -u mergerfs-panel-restore.service -b`.
 
 ## Visual checks without a compositor
 
@@ -110,9 +146,10 @@ depend on compositor callbacks.
 | File | Notes |
 |---|---|
 | `backend.py` | No GTK at import time; everything here is testable |
+| `boot.py` | systemd user unit generation, lingering, headless restore |
 | `config.py` | Disk format; atomic writes; no GTK |
 | `ui.py` | GTK objects, DnD payloads, confirmations |
-| `__main__.py` | Entry point; `--self-test` is hidden from `--help` |
+| `__main__.py` | Entry point; `--restore-pools`, `--self-test` |
 
 Conventions:
 

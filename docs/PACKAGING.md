@@ -22,6 +22,9 @@ All package builds consume the same source tarball. The tarball has a single
 `mergerfs-panel-<version>/` top-level directory containing `pyproject.toml`, `src/`,
 `data/`, `tests/`, `LICENSE`, and `README.md`.
 
+The systemd user unit used by boot restore is generated at runtime by the
+application; packages do not install unit files.
+
 ## Source tarball
 
 ```bash

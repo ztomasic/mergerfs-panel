@@ -22,6 +22,9 @@ Package names by distribution:
 Download the RPM for your Fedora release from
 <https://github.com/trapexit/mergerfs/releases> and install it with `dnf`.
 
+Boot restore uses a systemd user service plus lingering; the feature is not available
+on init systems without systemd. Everything else works without it.
+
 GTK 4.10 means Debian 13+ and Ubuntu 24.04+. Distributions with older GTK can still
 build the app, but dialogs (confirmations and errors) will fail at runtime.
 
@@ -134,7 +137,7 @@ Equivalently: `PYTHONPATH=app/src python3 -m mergerfs_panel`.
 ## Verify the installation
 
 ```bash
-mergerfs-panel --version          # mergerfs-panel 0.1.0
+mergerfs-panel --version          # mergerfs-panel 0.2.0
 desktop-file-validate /usr/share/applications/mergerfs-panel.desktop
 ```
 

@@ -132,6 +132,41 @@ not abort startup.
 External pools (not in the config) can be edited live, but nothing is persisted for
 them; the UI warns about this.
 
+## Boot restore
+
+The header checkbox is a thin wrapper over two systemd concepts:
+
+- a **user unit** at `~/.config/systemd/user/mergerfs-panel-restore.service`;
+- **lingering** for the user (`loginctl enable-linger`), which starts the user's
+  systemd instance at boot instead of at login.
+
+The unit is `Type=oneshot` and runs:
+
+```
+ExecStart=<python> -m mergerfs_panel --restore-pools --wait 600
+```
+
+The command reuses the same `Config` and `backend` code as the GUI and imports no
+GTK. `PYTHONPATH` is pinned to the package that generated the unit, so the service
+runs the same code as the app instead of whatever happens to be importable from
+site-packages.
+
+The restore algorithm:
+
+1. Read the config and select pools with `autostart` true.
+2. Skip pools that are already mounted.
+3. Poll until all configured branches of a pool exist, then mount it. A ready pool
+   is not delayed by another pool's missing branch.
+4. At the deadline, mount the remaining pools with the branches that exist and log
+   the missing ones; skip pools with no branch at all.
+5. Exit 0 unless a mount attempt failed, in which case exit 1.
+
+`TimeoutStartSec` is set slightly above the wait so systemd does not kill a waiting
+service. Enabling the checkbox writes the unit, reloads the user manager, enables
+the service, and requests lingering. If lingering is denied, the unit is removed
+again, so the checkbox never claims a boot restore that cannot happen. Disabling
+removes the unit and leaves lingering untouched.
+
 ## Threading and UI updates
 
 Blocking work — UDisks2 calls, subprocess mounts, xattr writes — runs on short-lived

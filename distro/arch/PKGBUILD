@@ -1,6 +1,6 @@
 # Maintainer: MergerFS Panel Contributors <maintainers@example.com>
 pkgname=mergerfs-panel
-pkgver=0.1.0
+pkgver=0.2.0
 pkgrel=1
 pkgdesc="Two-panel GTK4 manager for mergerfs pools"
 arch=('any')
