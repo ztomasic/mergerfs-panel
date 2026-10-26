@@ -1,6 +1,7 @@
 # MergerFS Panel
 
 [![CI](https://github.com/ztomasic/mergerfs-panel/actions/workflows/ci.yml/badge.svg)](https://github.com/ztomasic/mergerfs-panel/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A native GTK4 desktop application for managing [mergerfs](https://trapexit.github.io/mergerfs/)
 pools on Linux. Two panels — disks on the left, mounted pools on the right — with
