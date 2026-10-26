@@ -92,6 +92,8 @@ pool, then retry. The app never performs a lazy unmount automatically.
 
 ## Restore pools at boot
 
+![Mount pools at boot checkbox](boot-toggle.png)
+
 The **Mount pools at boot** checkbox in the header installs a systemd user service
 at `~/.config/systemd/user/mergerfs-panel-restore.service` and enables it. So that
 the service can start before you log in, the app also enables lingering for your
