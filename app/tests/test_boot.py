@@ -105,6 +105,28 @@ class ServiceInstallTests(unittest.TestCase):
 
 @unittest.skipUnless(backend.mergerfs_available(), "mergerfs is not installed")
 class RestoreTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Mounting may be forbidden in containers and CI runners even when the
+        # mergerfs binary exists. Probe once so the suite skips instead of
+        # reporting environment failures as test failures.
+        root = tempfile.mkdtemp(prefix="mfp-restore-probe-")
+        branch = os.path.join(root, "branch")
+        pool = os.path.join(root, "pool")
+        os.makedirs(branch)
+        os.makedirs(pool)
+        try:
+            backend.mount_pool([branch], pool)
+        except backend.MergerfsError as exc:
+            raise unittest.SkipTest(f"cannot mount in this environment: {exc}") from exc
+        finally:
+            if backend.is_mounted(pool):
+                try:
+                    backend.unmount_pool(pool)
+                except backend.MergerfsError:
+                    pass
+            shutil.rmtree(root, ignore_errors=True)
+
     def setUp(self):
         self.root = tempfile.mkdtemp(prefix="mfp-restore-")
         self.disk1 = os.path.join(self.root, "disk1")
