@@ -1,0 +1,3 @@
+data/mergerfs-panel.desktop usr/share/applications
+data/mergerfs-panel.svg usr/share/icons/hicolor/scalable/apps
+data/mergerfs-panel.metainfo.xml usr/share/metainfo

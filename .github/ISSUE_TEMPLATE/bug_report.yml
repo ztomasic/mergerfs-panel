@@ -1,0 +1,114 @@
+name: Bug report
+description: Report a reproducible problem
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please include enough detail to reproduce the problem.
+        Do not include secrets; redact private paths if necessary.
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `mergerfs-panel --version`
+      placeholder: mergerfs-panel 0.1.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: Installation method
+      options:
+        - Fedora RPM
+        - Debian / Ubuntu package
+        - Arch package
+        - Universal installer
+        - Running from the source tree
+    validations:
+      required: true
+
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and version
+      placeholder: Fedora 43 / Debian 13 / Arch
+    validations:
+      required: true
+
+  - type: dropdown
+    id: session
+    attributes:
+      label: Desktop session
+      options:
+        - KDE Plasma (Wayland)
+        - KDE Plasma (X11)
+        - GNOME (Wayland)
+        - GNOME (X11)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: mergerfs
+    attributes:
+      label: mergerfs version
+      description: Output of `mergerfs --version` (first line), if relevant
+      placeholder: mergerfs v2.42.0
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Mount a pool with two branches
+        2. Drag disk A onto the pool
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Terminal output from `MFP_DEBUG=1 mergerfs-panel` while reproducing
+      render: shell
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Output of the commands below, if relevant
+      value: |
+        ```
+        findmnt -t fuse.mergerfs -o TARGET,SOURCE,OPTIONS
+        getfattr -n user.mergerfs.branches --only-values <mountpoint>/.mergerfs
+        ```
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues for the same problem
+          required: true
+        - label: I read docs/TROUBLESHOOTING.md
+          required: true

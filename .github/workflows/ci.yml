@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests and package sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-gi gir1.2-gtk-4.0 python3-venv desktop-file-utils
+          sudo apt-get install -y mergerfs || echo "mergerfs unavailable; live pool tests will skip"
+
+      - name: Unit and integration tests
+        run: PYTHONPATH=app/src python3 -m unittest discover -s app/tests -v
+
+      - name: Validate desktop entry
+        run: desktop-file-validate app/data/mergerfs-panel.desktop
+
+      - name: Build wheel
+        run: |
+          python3 -m venv /tmp/venv
+          /tmp/venv/bin/pip install --upgrade pip build
+          /tmp/venv/bin/python -m build --wheel --outdir dist app
+
+      - name: Inspect wheel
+        run: |
+          /tmp/venv/bin/python - <<'PY'
+          import glob, zipfile
+          wheel = glob.glob("dist/*.whl")[0]
+          with zipfile.ZipFile(wheel) as archive:
+              names = archive.namelist()
+          assert "mergerfs_panel/__main__.py" in names
+          assert any(name.endswith("entry_points.txt") for name in names)
+          print(wheel, "contains", len(names), "files")
+          PY

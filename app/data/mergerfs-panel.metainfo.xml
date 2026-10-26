@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>mergerfs-panel</id>
+  <name>MergerFS Panel</name>
+  <summary>Manage disks and mergerfs pools with drag and drop</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <description>
+    <p>
+      MergerFS Panel is a small GTK4 utility for managing mergerfs pools. The
+      left panel lists the filesystems attached to the machine; the right panel
+      lists the mergerfs pools that are currently mounted.
+    </p>
+    <p>
+      Drag a disk onto a pool to add it as a branch, or drag a pool or branch
+      back onto the disks panel to unmount the pool or remove the branch.
+      Branches are changed through mergerfs' live runtime interface, so open
+      files on the pool are not interrupted.
+    </p>
+    <p>
+      Mounting and unmounting disks goes through UDisks2, with the usual
+      polkit authentication. Pools are mounted as the current user, so no root
+      helper is required.
+    </p>
+  </description>
+  <launchable type="desktop-id">mergerfs-panel.desktop</launchable>
+  <provides>
+    <binary>mergerfs-panel</binary>
+  </provides>
+  <categories>
+    <category>System</category>
+    <category>FileTools</category>
+  </categories>
+  <releases>
+    <release version="0.1.0" date="2026-10-26"/>
+  </releases>
+</component>

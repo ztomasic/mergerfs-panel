@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mergerfs-panel"
+version = "0.1.0"
+description = "Two-panel GTK4 manager for mergerfs pools with drag and drop"
+readme = { text = "Manage disks and mergerfs pools with drag and drop.", content-type = "text/plain" }
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "MergerFS Panel contributors" }]
+keywords = ["mergerfs", "fuse", "pool", "union filesystem", "storage"]
+classifiers = [
+    "Environment :: X11 Applications :: GTK",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Filesystems",
+]
+dependencies = []
+
+[project.gui-scripts]
+mergerfs-panel = "mergerfs_panel.__main__:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = ["mergerfs_panel"]

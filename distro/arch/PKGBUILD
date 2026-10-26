@@ -1,0 +1,27 @@
+# Maintainer: MergerFS Panel Contributors <maintainers@example.com>
+pkgname=mergerfs-panel
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Two-panel GTK4 manager for mergerfs pools"
+arch=('any')
+url="https://trapexit.github.io/mergerfs/"
+license=('MIT')
+depends=('python' 'python-gobject' 'gtk4')
+optdepends=('mergerfs: create and mount pools')
+makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "$pkgname-$pkgver"
+    python -m build --wheel --no-isolation
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+    python -m installer --destdir="$pkgdir" dist/*.whl
+    install -Dm644 data/mergerfs-panel.desktop "$pkgdir/usr/share/applications/mergerfs-panel.desktop"
+    install -Dm644 data/mergerfs-panel.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/mergerfs-panel.svg"
+    install -Dm644 data/mergerfs-panel.metainfo.xml "$pkgdir/usr/share/metainfo/mergerfs-panel.metainfo.xml"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

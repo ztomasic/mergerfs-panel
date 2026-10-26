@@ -1,0 +1,21 @@
+Source: mergerfs-panel
+Section: admin
+Priority: optional
+Maintainer: MergerFS Panel Contributors <maintainers@example.com>
+Standards-Version: 4.6.2
+Build-Depends: debhelper-compat (= 13), dh-sequence-python3, python3-all, python3-setuptools
+Rules-Requires-Root: no
+
+Package: mergerfs-panel
+Architecture: all
+Depends: ${python3:Depends}, ${misc:Depends}, python3-gi, gir1.2-gtk-4.0
+Recommends: mergerfs
+Description: Two-panel GTK4 manager for mergerfs pools
+ MergerFS Panel lists the filesystems on the machine and the mergerfs pools
+ that are currently mounted, and lets the user add a disk as a live branch by
+ dragging it onto a pool. Pools and branches can be dragged back to the disks
+ panel to unmount or remove them.
+ .
+ Disks are mounted through UDisks2 with the usual polkit authentication, and
+ branches are managed through mergerfs' runtime xattr interface, so no root
+ helper is required.

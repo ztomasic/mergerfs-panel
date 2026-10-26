@@ -1,0 +1,59 @@
+name: Feature request
+description: Suggest an improvement or a new capability
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem first, then the proposed solution. Features that change
+        the project's scope (file browsing, RAID, fstab/systemd editing, running as
+        root) need a strong justification.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is difficult or missing today?
+      placeholder: When managing a pool with many disks, ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should the app do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other tools, scripts, or workflows you tried
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Disks panel / UDisks2
+        - Pools and branches
+        - Drag and drop
+        - Configuration and persistence
+        - Packaging and installation
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues for the same request
+          required: true
+        - label: This is not a request for RAID, parity, or file browsing
+          required: true

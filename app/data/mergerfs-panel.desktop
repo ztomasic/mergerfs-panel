@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=MergerFS Panel
+GenericName=mergerfs pool manager
+Comment=Combine disks into mergerfs pools with drag and drop
+Exec=mergerfs-panel
+Icon=mergerfs-panel
+Terminal=false
+Categories=System;FileTools;
+Keywords=mergerfs;union;pool;storage;disk;merge;
+StartupNotify=true
+StartupWMClass=org.mergerfs.Panel
